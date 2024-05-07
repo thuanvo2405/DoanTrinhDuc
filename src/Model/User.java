@@ -47,6 +47,10 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	
+	public User() {
+		super();
+	}
 	public User(int user_id, String password, String username, String email, Date created_at, Date last_login) {
 		super();
 		this.user_id = user_id;

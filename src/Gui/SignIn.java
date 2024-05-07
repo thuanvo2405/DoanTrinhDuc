@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import Bus.UserBus;
 import Model.User;
+import Utils.Utils;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,18 +17,27 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.awt.event.ActionEvent;
 
 public class SignIn extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField txtName;
-	private JTextField txtPass;
+	private static JTextField txtName;
+	private static JTextField txtPass;
 	
 	private ArrayList<User> dsUser = new ArrayList<User>();
 	private UserBus userBus = new UserBus();
+	private static User s;
 	/**
 	 * Launch the application.
 	 */
@@ -88,14 +98,13 @@ public class SignIn extends JFrame {
 				String passWord = txtPass.getText();
 				
 				if (userBus.DangNhap(userName, passWord) == 1) {
-					Main frame = new Main();
+					s = getAllInfoUser();
+					Main frame = new Main(s);
 					frame.setVisible(true);
-					
 					dispose();
 				} else {
 					JOptionPane.showMessageDialog(null, "Thong tin khong hop le");
 				}
-				
 			}
 		});
 		btnDN.setBounds(125, 185, 107, 35);
@@ -114,5 +123,29 @@ public class SignIn extends JFrame {
 		btnDK.setBounds(348, 192, 107, 35);
 		contentPane.add(btnDK);
 	}
+	public static User getAllInfoUser() {
+		String email = txtName.getText().toString();
+		String passWord = txtPass.getText().toString();
+		User temp = null;
+		
+        String query = "SELECT * FROM users where email = '" + email + "' and password_hash = '" + passWord + "'";
 
+        try (Connection conn =  DriverManager.getConnection(Utils.DB_URL, Utils.USER, Utils.PASS);
+             PreparedStatement pstmt = conn.prepareStatement(query);
+             ResultSet rs =  pstmt.executeQuery()) {
+            
+            if (rs.next()) {
+                int usrs_id = rs.getInt("user_id");
+                String username = (rs.getString("username"));
+                String emailsub = (rs.getString("email"));
+                String password = (rs.getString("password_hash"));
+                Date created_at = (rs.getDate("created_at"));
+                Date last_login = (rs.getDate("last_login"));
+                temp = new User(usrs_id, password, username, emailsub, created_at, last_login);
+            }
+        }catch(Exception e) {
+        	e.printStackTrace();
+        }
+		return temp;
+	}
 }

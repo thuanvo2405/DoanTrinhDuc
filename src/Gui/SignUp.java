@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import com.mysql.cj.x.protobuf.MysqlxNotice.Frame;
+
 import Bus.UserBus;
 import Model.User;
 
@@ -102,9 +104,13 @@ public class SignUp extends JFrame {
 				
 				int result = userBus.DangKy(userName, email, passWord);
 				if(result == 1) {
-	            	JOptionPane.showMessageDialog(null, "Them thanh cong");
+	            	JOptionPane.showMessageDialog(null, "Đăng ký thành công");
+	            	SignIn frame = new SignIn();
+					frame.setVisible(true);
+					
+					dispose();
 	            }else {
-	            	JOptionPane.showMessageDialog(null, "Them that bai");
+	            	JOptionPane.showMessageDialog(null, "Đăng ký thất bại");
 	            }
 			}
 		});
